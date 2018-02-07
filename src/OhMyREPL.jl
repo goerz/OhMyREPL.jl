@@ -8,7 +8,7 @@ module OhMyREPL
 using Tokenize
 using Crayons
 
-export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, test_colorscheme
+export colorscheme!, colorschemes, enable_autocomplete_brackets, enable_highlight_markdown, test_colorscheme, background
 
 include("repl_pass.jl")
 include("repl.jl")
@@ -78,6 +78,18 @@ function test_colorscheme(cs::Passes.SyntaxHighlighter.ColorScheme, str::String 
         end
     end
     return
+end
+
+
+"""Return "light" or "dark", depending on the color of the terminal
+background"""
+function background()
+    bg = split(get(ENV, "COLORFGBG", "0;15"), ";")[2]
+    if bg == "0"
+        return "dark"
+    else
+        return "light"
+    end
 end
 
 

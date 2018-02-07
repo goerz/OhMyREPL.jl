@@ -3,9 +3,13 @@ using Crayons
 using Tokenize
 
 import OhMyREPL.Passes.SyntaxHighlighter.SYNTAX_HIGHLIGHTER_SETTINGS
+import OhMyREPL.background
+
+_background = background()
 
 HIGHLIGHT_MARKDOWN = Ref(true)
 enable_highlight_markdown(v::Bool) = HIGHLIGHT_MARKDOWN[] = v
+
 
 function Base.Markdown.term(io::IO, md::Base.Markdown.Code, columns)
     code = md.code
@@ -41,7 +45,12 @@ function Base.Markdown.term(io::IO, md::Base.Markdown.Code, columns)
             SYNTAX_HIGHLIGHTER_SETTINGS(crayons, tokens, 0)
             buff = IOBuffer()
             if lang == "jldoctest" || lang == "julia-repl"
-                print(buff, Crayon(foreground = :yellow, bold = true), "julia> ", Crayon(reset = true))
+                # TODO: this should be taken from the colorscheme somehow
+                if _background == "light"
+                    print(buff, Crayon(foreground = :black, bold = true), "julia> ", Crayon(reset = true))
+                else
+                    print(buff, Crayon(foreground = :yellow, bold = true), "julia> ", Crayon(reset = true))
+                end
             end
             for (token, crayon) in zip(tokens, crayons)
                 print(buff, crayon)
@@ -63,5 +72,14 @@ function Base.Markdown.term(io::IO, md::Base.Markdown.Code, columns)
                 println(io, line)
             end
         end
+    end
+end
+
+function Base.Markdown.terminline(io::IO, code::Base.Markdown.Code)
+    # TODO: this should be taken from the colorscheme somehow
+    if _background == "light"
+        print(io, Crayon(background = 188), code.code, Crayon(reset=true))
+    else
+        print(io, Crayon(background = 234), code.code, Crayon(reset=true))
     end
 end
